@@ -6,6 +6,11 @@ hw_timer_t *timer;
 void IRTimer(); // defined in IRremote.cpp
 #endif
 
+#ifdef IR_TIMER_USE_STM32F1XX
+HardwareTimer timer(2);
+void IRTimer(); // defined in IRremote.cpp
+#endif
+
 //+=============================================================================
 // Decodes the received IR message
 // Returns 0 if no data ready, 1 if data ready.
@@ -123,7 +128,7 @@ IRrecv::IRrecv (int recvpin, int blinkpin)
 void  IRrecv::enableIRIn ( )
 {
 // Interrupt Service Routine - Fires every 50uS
-#ifdef ESP32
+#if defined (ESP32)
 	// ESP32 has a proper API to setup timers, no weird chip macros needed
 	// simply call the readable API versions :)
 	// 3 timers, choose #1, 80 divider nanosecond precision, 1 to count up
@@ -132,6 +137,25 @@ void  IRrecv::enableIRIn ( )
 	// every 50ns, autoreload = true
 	timerAlarmWrite(timer, 50, true);
 	timerAlarmEnable(timer);
+
+#elif defined (__STM32F1__)
+
+#ifndef F_INTERRUPTS
+#  define F_INTERRUPTS                          20000   // interrupts per second, min: 10000, max: 20000, typ: 15000
+#endif
+
+  timer.pause();
+  timer.setPrescaleFactor( ((F_CPU / F_INTERRUPTS) / 8) - 1);
+  timer.setOverflow(7);
+  timer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  timer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  timer.attachCompare1Interrupt(IRTimer);
+  // Refresh the timer's count, prescale, and overflow
+  timer.refresh();
+
+  // Start the timer counting
+  timer.resume();
+  
 #else
 	cli();
 	// Setup pulse clock timer interrupt
