@@ -145,7 +145,7 @@ void  IRrecv::enableIRIn ( )
 #endif
 
   timer.pause();
-  timer.setPrescaleFactor( ((F_CPU / F_INTERRUPTS) / 8) - 1);
+  timer.setPrescaleFactor( ((SYSCLOCK / F_INTERRUPTS) / 8) - 1);
   timer.setOverflow(7);
   timer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   timer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
