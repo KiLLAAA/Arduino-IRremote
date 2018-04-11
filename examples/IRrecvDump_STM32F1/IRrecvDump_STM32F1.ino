@@ -10,14 +10,19 @@
 
 #include <IRremote.h> // default location @ libraries
 //#include "IRremote.h" // same folder as .ino
-//#include </home/YOUR-FOLDER/arduino-1.8.1/libraries/IRremote/IRremote.h> // full path specified, check folder
+//#include </YOUR-FOLDER/arduino-1.x.x/libraries/IRremote/IRremote.h> // full path specified
 
 /*
-   Default is Arduino pin D11.
+   Default for STM32F1 is PC15, for Arduino pin D11.
    You can change this to another available Arduino Pin.
    Your IR receiver should be connected to the pin defined here
 */
+
+#if defined(__STM32F1__)
 int RECV_PIN = PC15;
+#else
+int RECV_PIN = 11;
+#endif
 
 IRrecv irrecv(RECV_PIN);
 
@@ -43,7 +48,7 @@ void setup()
 #endif
 
   irrecv.enableIRIn(); // Start the receiver
-  Serial.print(F("READY!"));
+  Serial.println(F("READY!"));
   Serial.println();
 }
 
