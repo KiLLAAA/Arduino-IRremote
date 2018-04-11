@@ -140,7 +140,7 @@ void  IRrecv::enableIRIn ( )
 
 #elif defined (__STM32F1__)
 
-#ifndef F_INTERRUPTS
+#ifndef F_INTERRUPTS                                    // TODO: move to proper place or replace the variable
 #  define F_INTERRUPTS                          20000   // interrupts per second, min: 10000, max: 20000, typ: 15000
 #endif
 
